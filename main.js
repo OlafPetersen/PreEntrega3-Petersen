@@ -28,27 +28,56 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const boton = document.querySelector("#boton");
-  boton.addEventListener("click", () => {
-    const accion = prompt("¿Qué acción deseas realizar? (mostrar, agregar, buscar, ordenar)");
-    switch (accion) {
-      case "mostrar":
-        mostrarTabla();
-        break;
-      case "agregar":
-        const nombre = prompt("Ingresa el nombre de la persona");
-        const edad = parseInt(prompt("Ingresa la edad de la persona"));
-        agregarPersona(nombre, edad);
-        break;
-      case "buscar":
-        const nombreBusqueda = prompt("Ingresa el nombre de la persona a buscar");
-        const resultado = buscarPersona(nombreBusqueda);
-        console.table(resultado);
-        break;
-      case "ordenar":
-        ordenarPorEdad();
-        break;
-      default:
-        alert("Acción no válida");
+  boton.addEventListener("click", async () => {
+    const { value: accion } = await Swal.fire({
+      title: "¿Qué acción deseas realizar?",
+      input: "select",
+      inputOptions: {
+        mostrar: "Mostrar",
+        agregar: "Agregar",
+        buscar: "Buscar",
+        ordenar: "Ordenar"
+      },
+      showCancelButton: true
+    });
+
+    if (accion) {
+      switch (accion) {
+        case "mostrar":
+          mostrarTabla();
+          break;
+        case "agregar":
+          const { value: nombre } = await Swal.fire({
+            title: "Ingresa el nombre de la persona",
+            input: "text",
+            showCancelButton: true
+          });
+          const { value: edad } = await Swal.fire({
+            title: "Ingresa la edad de la persona",
+            input: "number",
+            showCancelButton: true
+          });
+          if (nombre && edad) {
+            agregarPersona(nombre, parseInt(edad));
+          }
+          break;
+        case "buscar":
+          const { value: nombreBusqueda } = await Swal.fire({
+            title: "Ingresa el nombre de la persona a buscar",
+            input: "text",
+            showCancelButton: true
+          });
+          if (nombreBusqueda) {
+            const resultado = buscarPersona(nombreBusqueda);
+            console.table(resultado);
+          }
+          break;
+        case "ordenar":
+          ordenarPorEdad();
+          break;
+        default:
+          Swal.fire("Acción no válida");
+      }
     }
   });
 });
