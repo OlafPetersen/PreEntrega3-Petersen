@@ -10,21 +10,44 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function mostrarTabla() {
-    console.table(personas);
+    const tbody = document.querySelector("#tabla tbody");
+    tbody.innerHTML = "";
+    for (const persona of personas) {
+      const tr = document.createElement("tr");
+      const tdNombre = document.createElement("td");
+      tdNombre.textContent = persona.nombre;
+      tr.appendChild(tdNombre);
+      const tdEdad = document.createElement("td");
+      tdEdad.textContent = persona.edad;
+      tr.appendChild(tdEdad);
+      tbody.appendChild(tr);
+    }
   }
 
   function agregarPersona(nombre, edad) {
     personas.push({ nombre, edad });
     guardarPersonas();
+    mostrarTabla();
   }
 
   function buscarPersona(nombre) {
-    return personas.filter(persona => persona.nombre === nombre);
+    const resultado = personas.filter(persona => persona.nombre === nombre);
+    if (resultado.length > 0) {
+      let mensaje = "Personas encontradas:\n";
+      for (const persona of resultado) {
+        mensaje += `Nombre: ${persona.nombre}, Edad: ${persona.edad}\n`;
+      }
+      Swal.fire(mensaje);
+    } else {
+      Swal.fire("No se encontró ninguna persona con ese nombre");
+    }
   }
+  
 
   function ordenarPorEdad() {
     personas.sort((a, b) => a.edad - b.edad);
     guardarPersonas();
+    mostrarTabla();
   }
 
   const boton = document.querySelector("#boton");
@@ -33,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "¿Qué acción deseas realizar?",
       input: "select",
       inputOptions: {
-        mostrar: "Mostrar",
         agregar: "Agregar",
         buscar: "Buscar",
         ordenar: "Ordenar"
@@ -43,9 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (accion) {
       switch (accion) {
-        case "mostrar":
-          mostrarTabla();
-          break;
         case "agregar":
           const { value: nombre } = await Swal.fire({
             title: "Ingresa el nombre de la persona",
@@ -69,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           if (nombreBusqueda) {
             const resultado = buscarPersona(nombreBusqueda);
-            console.table(resultado);
           }
           break;
         case "ordenar":
@@ -80,4 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  mostrarTabla();
 });
